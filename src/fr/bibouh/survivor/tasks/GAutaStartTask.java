@@ -62,6 +62,17 @@ public class GAutaStartTask extends BukkitRunnable {
                     player.getInventory().clear();
                     player.teleport(spawn);
                     player.setGameMode(GameMode.ADVENTURE);
+                    ItemStack itemStack = GPLayerListener.map.get(player);
+                        if(itemStack ==  GPLayerListener.medecin) {
+                            ...
+                        }
+                        else if(itemStack ==  GPLayerListener.grenadier) {
+                            ...
+                        }
+                        else if() {
+                            ...
+                        }
+                    }
                     if(GPLayerListener.map.get()) {
 
 
