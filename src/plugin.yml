@@ -1,0 +1,14 @@
+name: Survivor
+author: Bibouh pour TheLegendOfCraft
+version: 1.0
+main: fr.bibouh.survivor.Main
+commands:
+  survivor:
+    description: Commande permettant d'afficher les commandes du survivor (réservé au staff)
+    permission: op.use
+  packapunch:
+    description: Commande permettant de pack à puncher l'arme en main.
+    permission: op.use
+  survivorstop:
+    description: Commande permettant de stoper le jeu.
+    permission: op.use
