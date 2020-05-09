@@ -76,7 +76,7 @@ public class GAutaStartTask extends BukkitRunnable {
 
                 } else if (itemStack == GPLayerListener.grenadier) {
 
-                    giveWeapon()
+                    giveWeapon(player, "grenade", "6");
 
                 }
                 //else if() {
