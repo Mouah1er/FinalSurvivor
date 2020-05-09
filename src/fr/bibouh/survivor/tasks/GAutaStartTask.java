@@ -76,7 +76,7 @@ public class GAutaStartTask extends BukkitRunnable {
 
                 } else if (itemStack == GPLayerListener.grenadier) {
 
-                    
+
 
                 }
                 //else if() {

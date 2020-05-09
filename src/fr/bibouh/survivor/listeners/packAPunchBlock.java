@@ -19,14 +19,14 @@ public class packAPunchBlock implements Listener {
     public HashMap<Player, ItemMeta> map = new HashMap<>();
 
     @EventHandler
-    public void onRightClick(PlayerInteractEvent event){
+    public void onRightClick(PlayerInteractEvent event) {
 
         Player player = event.getPlayer();
 
-        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
             Block block = event.getClickedBlock();
-            if (block.getType() == Material.ANVIL){
+            if (block.getType() == Material.ANVIL) {
 
                 event.setCancelled(true);
 

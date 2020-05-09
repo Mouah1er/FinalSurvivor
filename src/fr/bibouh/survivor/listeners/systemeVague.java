@@ -9,11 +9,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class systemeVague implements Listener {
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
+    public void onPlayerJoin(PlayerJoinEvent event) {
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 
-            if(player.equals(2)) {
+            if (player.equals(2)) {
 
                 player.sendMessage("test");
 

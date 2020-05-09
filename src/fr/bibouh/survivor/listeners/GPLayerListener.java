@@ -41,18 +41,18 @@ public class GPLayerListener implements Listener {
     public static ItemStack ranger = new ItemStack(Material.BONE);
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event){
+    public void onJoin(PlayerJoinEvent event) {
 
         Player player = event.getPlayer();
         ItemStack kit = new ItemStack(Material.LEATHER);
 
-        Location spawn = new Location(Bukkit.getWorld("world"),-291, 93, 14, -0.0f, 1.2f);
+        Location spawn = new Location(Bukkit.getWorld("world"), -291, 93, 14, -0.0f, 1.2f);
         player.teleport(spawn);
         player.getInventory().clear();
         player.setFoodLevel(20);
         player.setHealth(20);
 
-        if(main.isState(GState.PLAYING)) {
+        if (main.isState(GState.PLAYING)) {
 
             player.setGameMode(GameMode.SPECTATOR);
             player.sendMessage("§4Le jeu a déjà démarré");
@@ -70,11 +70,11 @@ public class GPLayerListener implements Listener {
 
         }*/
 
-        if(!main.getPlayers().contains(player))main.getPlayers().add(player);
+        if (!main.getPlayers().contains(player)) main.getPlayers().add(player);
         player.setGameMode(GameMode.ADVENTURE);
-        event.setJoinMessage("§f[§6The Legend Of Craft§f] §6"+player.getName()+" §6a rejoint la partie ! §6[§a" +main.getPlayers().size()+"§a/4§6]");
+        event.setJoinMessage("§f[§6The Legend Of Craft§f] §6" + player.getName() + " §6a rejoint la partie ! §6[§a" + main.getPlayers().size() + "§a/4§6]");
 
-        if(main.isState(GState.WAITING) && main.getPlayers().size() == 2) {
+        if (main.isState(GState.WAITING) && main.getPlayers().size() == 2) {
 
             GAutaStartTask start = new GAutaStartTask(main);
             start.runTaskTimer(main, 0, 20);
@@ -88,7 +88,8 @@ public class GPLayerListener implements Listener {
 
         kit.setItemMeta(kitM);
 
-        if(player.getInventory().contains(kit.getType())) return; else player.getInventory().setItem(0, kit);
+        if (player.getInventory().contains(kit.getType())) return;
+        else player.getInventory().setItem(0, kit);
 
 
     }
@@ -97,7 +98,7 @@ public class GPLayerListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
-        event.setQuitMessage("§f[§6The Legend Of Craft§f] §6"+player.getName()+" §6a quitté la partie ! §6[§c   "+main.getPlayers().size()+"§c/4§6]");
+        event.setQuitMessage("§f[§6The Legend Of Craft§f] §6" + player.getName() + " §6a quitté la partie ! §6[§c   " + main.getPlayers().size() + "§c/4§6]");
 
     }
 
@@ -109,24 +110,24 @@ public class GPLayerListener implements Listener {
         ItemStack itemStack = event.getItem();
         Inventory inventory = Bukkit.createInventory(null, 9, "§7Les kits");
 
-        if(itemStack != null && itemStack.getType() == Material.LEATHER) {
+        if (itemStack != null && itemStack.getType() == Material.LEATHER) {
 
             ItemMeta grenadierM = grenadier.getItemMeta();
             grenadierM.setDisplayName("§2Grenadier");
             grenadierM.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_POTION_EFFECTS);
-            grenadierM.setLore(Arrays.asList("§1Vous obtenez à chaque début de vague:", "§3-§6 6 grenades", "§3-§6 1 grenade incendiaire", "§3- §63 grenades à fragmentations"));
+            grenadierM.setLore(Arrays.asList("§1Vous obtenez à chaque début de vague:", "§3-§6 6 grenades", "§3- §63 grenades à fragmentations"));
             grenadier.setItemMeta(grenadierM);
             inventory.setItem(1, grenadier);
 
             ItemMeta medecinM = medecin.getItemMeta();
             medecinM.setDisplayName("§dMédecin");
-            medecinM.setLore(Arrays.asList("§3- §6Vous réanimez instantanément vos coéquipiers", "§3- §6Vous vous soignez plus rapidement avec vos kits de soins"));
+            medecinM.setLore(Arrays.asList("§3- §6Vous réanimez instantanément vos coéquipiers", "§3- §6Vous vous soignez plus rapidement avec vos 5 kits de soins"));
             medecin.setItemMeta(medecinM);
             inventory.setItem(0, medecin);
 
             ItemMeta supportM = support.getItemMeta();
             supportM.setDisplayName("§9Support");
-            supportM.setLore(Arrays.asList(" §1Vous obtenez à chaque début de vague:", "§3- §6CHOPPER CHICAGO 1921, 50 balles", "§3- §6Une boite de munition pour" , "§6réapprovisionner vos coéquipiers et vous en munitions"));
+            supportM.setLore(Arrays.asList(" §1Vous obtenez à chaque début de vague:", "§3- §6CHOPPER CHICAGO 1921, 50 balles", "§3- §6Une boite de munition pour", "§6réapprovisionner vos coéquipiers et vous en munitions"));
             support.setItemMeta(supportM);
             inventory.setItem(2, support);
 
@@ -155,11 +156,11 @@ public class GPLayerListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         ItemStack current = event.getCurrentItem();
 
-        if(current == null) return;
+        if (current == null) return;
 
-        if(inventory.getName().equalsIgnoreCase("§7Les kits")) {
+        if (inventory.getName().equalsIgnoreCase("§7Les kits")) {
 
-            if(current.getType() == Material.PAPER) {
+            if (current.getType() == Material.PAPER) {
 
                 event.setCancelled(true);
 
@@ -169,7 +170,7 @@ public class GPLayerListener implements Listener {
 
             }
 
-            if(current.getType() == Material.FIREWORK_CHARGE) {
+            if (current.getType() == Material.FIREWORK_CHARGE) {
 
                 event.setCancelled(true);
 
@@ -179,7 +180,7 @@ public class GPLayerListener implements Listener {
 
             }
 
-            if(current.getType() == Material.STICK) {
+            if (current.getType() == Material.STICK) {
 
                 event.setCancelled(true);
 
@@ -189,7 +190,7 @@ public class GPLayerListener implements Listener {
 
             }
 
-            if(current.getType() == Material.TRAP_DOOR) {
+            if (current.getType() == Material.TRAP_DOOR) {
 
                 event.setCancelled(true);
 
@@ -199,7 +200,7 @@ public class GPLayerListener implements Listener {
 
             }
 
-            if(current.getType() == Material.BONE) {
+            if (current.getType() == Material.BONE) {
 
                 event.setCancelled(true);
 

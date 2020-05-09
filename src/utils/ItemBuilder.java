@@ -28,7 +28,7 @@ public class ItemBuilder {
         is = new ItemStack(m, amount);
     }
 
-    public ItemBuilder(Material m, int amount, short meta){
+    public ItemBuilder(Material m, int amount, short meta) {
         is = new ItemStack(m, amount, meta);
     }
 
@@ -53,7 +53,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder hideInformation(){
+    public ItemBuilder hideInformation() {
         ItemMeta im = is.getItemMeta();
         im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         is.setItemMeta(im);
