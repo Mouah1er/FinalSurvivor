@@ -16,6 +16,7 @@ public class GAutaStartTask extends BukkitRunnable {
     private Main main;
     private int timer = 20;
     private GPLayerListener gpLayerListener;
+    private CSUtils csUtils = new CSUtils();
 
 
     public GAutaStartTask(Main main) {
@@ -76,7 +77,11 @@ public class GAutaStartTask extends BukkitRunnable {
 
                 } else if (itemStack == GPLayerListener.grenadier) {
 
-                    giveWeapon(player, "grenade", "6");
+                    if(csUtils.giveWeapon(player, "grenade", "6")){
+                        // ok ecrire un message
+                    }else {
+                        // Y a eu un probleme, ecrire un message
+                    }
 
                 }
                 //else if() {
