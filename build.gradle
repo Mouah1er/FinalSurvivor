@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id("io.papermc.paperweight.userdev") version "1.5.5"
+    id "com.github.johnrengelman.shadow" version "7.1.1"
+}
+
+group = 'fr.twah2em'
+version = '1.0-SNAPSHOT'
+description = 'Survivor plugin. Inspired by Epicube\'s minigame'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    maven { url "https://repo.dmulloy2.net/repository/public/" }
+
+    mavenLocal()
+}
+
+dependencies {
+    paperweight.paperDevBundle("1.19.4-R0.1-SNAPSHOT")
+
+    compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+}
+
+tasks {
+    assemble {
+        dependsOn(reobfJar)
+    }
+
+    compileJava {
+        options.encoding = "UTF-8"
+
+        options.release.set(17)
+    }
+
+    javadoc {
+        options.encoding = "UTF-8"
+    }
+
+    reobfJar {
+        outputJar.set(layout.buildDirectory.file("C:\\Users\\ocsar\\Desktop\\servers\\1.19.4\\plugins\\Survivor.jar"))
+    }
+}
+
+def targetJavaVersion = 17
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+//libsDirName="C:\\Users\\ocsar\\Desktop\\servers\\1.19.4\\plugins"
