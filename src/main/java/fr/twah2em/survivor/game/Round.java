@@ -44,13 +44,6 @@ public class Round {
 
     public void start(Main main) {
         Bukkit.broadcast(Messages.ROUND_START_MESSAGE.replaceText(TextReplacementConfig.builder().matchLiteral("%round%").replacement(String.valueOf(round)).build()));
-        final World world = main.getServer().getWorlds().get(0);
-        final Location[] windows = {
-                new Location(world, -837, 73, -95),
-                new Location(world, -835, 69, -77),
-                new Location(world, -819, 69, -71),
-                new Location(world, -813, 68, -97),
-        };
 
         new BukkitRunnable() {
             int playerNumber = 0;
@@ -68,8 +61,9 @@ public class Round {
                 final SetUniqueList<SurvivorPlayer> players = main.gameInfos().players();
 
                 final SurvivorPlayer survivorPlayer = players.get(playerNumber);
+                final Location closestWindow = survivorPlayer.closestWindow();
 
-                final Zombie zombie = NormalZombieEntity.spawn(survivorPlayer.closestWindow(windows));
+                final Zombie zombie = NormalZombieEntity.spawn(closestWindow);
                 zombiesInMap.add(zombie.getUniqueId());
 
                 zombiesToSpawn--;

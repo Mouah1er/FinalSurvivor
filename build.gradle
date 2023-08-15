@@ -46,7 +46,7 @@ tasks {
     }
 
     reobfJar {
-        outputJar.set(layout.buildDirectory.file("C:\\Users\\ocsar\\Desktop\\servers\\1.19.4\\plugins\\Survivor.jar"))
+        outputJar.set(layout.buildDirectory.file("C:\\Users\\ocsar\\Desktop\\servers\\paper-1.19.4\\plugins\\Survivor.jar"))
     }
 }
 
@@ -65,5 +65,3 @@ tasks.withType(JavaCompile).configureEach {
         options.release = targetJavaVersion
     }
 }
-
-//libsDirName="C:\\Users\\ocsar\\Desktop\\servers\\1.19.4\\plugins"

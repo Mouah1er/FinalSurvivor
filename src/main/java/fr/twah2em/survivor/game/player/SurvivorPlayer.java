@@ -1,5 +1,6 @@
 package fr.twah2em.survivor.game.player;
 
+import fr.twah2em.survivor.game.Room;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ public class SurvivorPlayer {
     private int deaths = 0;
     private int points = 0;
     private PlayerState state = PlayerState.ALIVE;
+    private Room room = null;
 
     public SurvivorPlayer(UUID uuid, String name) {
         this.uuid = uuid;
@@ -73,14 +75,22 @@ public class SurvivorPlayer {
         this.state = playerState;
     }
 
+    public Room room() {
+        return room;
+    }
+
+    public void room(Room room) {
+        this.room = room;
+    }
+
     public Player player() {
         return Bukkit.getPlayer(uuid);
     }
 
-    public Location closestWindow(Location[] windows) {
+    public Location closestWindow() {
         Location closestWindow = null;
 
-        for (Location window : windows) {
+        for (Location window : room.windows()) {
             if (closestWindow == null) {
                 closestWindow = window;
             } else {

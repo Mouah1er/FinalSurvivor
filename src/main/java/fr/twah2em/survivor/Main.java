@@ -22,6 +22,8 @@ public final class Main extends JavaPlugin {
         getLogger().info("Main plugin is starting !");
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
+        saveDefaultConfig();
+
         SurvivorCommandRegistration.registerCommands(this,
                 StartCommand::new
         );
@@ -30,11 +32,13 @@ public final class Main extends JavaPlugin {
                 PlayerJoinListener::new,
                 PlayerQuitListener::new,
                 EntityDamageListener::new,
-                EntityDeathListener::new
+                EntityDeathListener::new,
+                PlayerMoveListener::new,
+                PlayerEnterCuboidListener::new
         );
 
         this.gameLogic = new GameLogic(this);
-        this.gameInfos = new GameInfos();
+        this.gameInfos = new GameInfos(this.getConfig());
     }
 
     @Override
