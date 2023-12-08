@@ -2,7 +2,6 @@ package fr.twah2em.survivor.game;
 
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
-import fr.twah2em.survivor.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -32,7 +31,7 @@ public class GameLogic {
 
         Bukkit.getScheduler().runTask(main, task);
 
-        final Round round = main.gameInfos().roundInfo();
+        final Round round = main.gameInfos().round();
 
         round.calculateRoundInfos();
         round.start(main);

@@ -1,8 +1,6 @@
 package fr.twah2em.survivor.commands.internal;
 
 import fr.twah2em.survivor.utils.Messages;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 
 public interface SurvivorCommandCallback {
@@ -18,8 +16,7 @@ public interface SurvivorCommandCallback {
 
     static SurvivorCommandCallback notAPlayerCallback(CommandSender sender) {
         return () -> {
-            sender.sendMessage(Messages.PREFIX
-                    .append(Component.text("Vous devez être un jour pour utiliser cette commande !", NamedTextColor.RED)));
+            sender.sendMessage(Messages.NOT_A_PLAYER_ERROR);
 
             return false;
         };
@@ -27,8 +24,15 @@ public interface SurvivorCommandCallback {
 
     static SurvivorCommandCallback permissionCallback(CommandSender sender) {
         return () -> {
-            sender.sendMessage(Messages.PREFIX
-                    .append(Component.text("Vous n'avez pas la permission pour faire cela !", NamedTextColor.RED)));
+            sender.sendMessage(Messages.PERMISSION_ERROR);
+
+            return false;
+        };
+    }
+
+    static SurvivorCommandCallback argsCallback(CommandSender sender) {
+        return () -> {
+            sender.sendMessage(Messages.ARGS_ERROR);
 
             return false;
         };

@@ -4,7 +4,9 @@ import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.game.GameInfos;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
+import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.StreamUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -34,6 +36,10 @@ public class PlayerQuitListener implements SurvivorListener<PlayerQuitEvent> {
 
             main.gameInfos().players().remove(SurvivorPlayer.survivorPlayer(player, main.gameInfos().players()));
         } else {
+            if (Bukkit.getOnlinePlayers().isEmpty()) {
+                Bukkit.broadcast(Messages.EMPTY_GAME);
+                Bukkit.shutdown();
+            }
             if (StreamUtils.playerHasPlayerWrapper(player, main.gameInfos().players())) {
                 event.quitMessage(text("[", GRAY)
                         .append(text("-", RED))

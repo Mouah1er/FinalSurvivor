@@ -26,11 +26,11 @@ public class EntityDeathListener implements SurvivorListener<EntityDeathEvent> {
             final Player killer = event.getEntity().getKiller();
 
             if (killer != null) {
-                if (main.gameInfos().roundInfo().zombiesInMap().contains(entity.getUniqueId())) {
+                if (main.gameInfos().round().zombiesInMap().contains(entity.getUniqueId())) {
                     event.setDroppedExp(0);
                     event.getDrops().clear();
                     SurvivorPlayer.survivorPlayer(killer, main.gameInfos().players()).addPoints(90);
-                    main.gameInfos().roundInfo().zombieKilled(entity.getUniqueId());
+                    main.gameInfos().round().zombieKilled(entity.getUniqueId());
                     killer.sendMessage(Messages.ZOMBIE_KILLED_MESSAGE);
                 }
             }

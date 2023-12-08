@@ -1,12 +1,18 @@
 package fr.twah2em.survivor.game.player;
 
+import com.mojang.brigadier.Message;
+import fr.twah2em.survivor.game.GameInfos;
 import fr.twah2em.survivor.game.Room;
+import fr.twah2em.survivor.utils.Cuboid;
+import fr.twah2em.survivor.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SurvivorPlayer {
     private final UUID uuid;
@@ -17,6 +23,7 @@ public class SurvivorPlayer {
     private int points = 0;
     private PlayerState state = PlayerState.ALIVE;
     private Room room = null;
+    private Cuboid cuboid = null;
 
     public SurvivorPlayer(UUID uuid, String name) {
         this.uuid = uuid;
@@ -83,8 +90,20 @@ public class SurvivorPlayer {
         this.room = room;
     }
 
+    public Cuboid cuboid() {
+        return cuboid;
+    }
+
+    public void cuboid(Cuboid cuboid) {
+        this.cuboid = cuboid;
+    }
+
     public Player player() {
         return Bukkit.getPlayer(uuid);
+    }
+
+    public boolean isOnline() {
+        return player() != null;
     }
 
     public Location closestWindow() {
@@ -113,7 +132,7 @@ public class SurvivorPlayer {
         return players
                 .stream()
                 .filter(survivorPlayer -> survivorPlayer.uniqueId().equals(player.getUniqueId()))
-                .findFirst()
+                .findAny()
                 .orElse(null);
     }
 

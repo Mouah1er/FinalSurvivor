@@ -1,4 +1,4 @@
-package fr.twah2em.survivor.commands;
+package fr.twah2em.survivor.commands.start;
 
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.commands.internal.SurvivorCommand;
@@ -54,8 +54,6 @@ public class StartCommand extends SurvivorCommand {
 
     @Override
     public SurvivorCommandCallback shouldBeExecuted(CommandSender commandSender, String[] args) {
-        if (!(commandSender instanceof Player)) return SurvivorCommandCallback.notAPlayerCallback(commandSender);
-
         if (!commandSender.hasPermission("survivor.start")) return SurvivorCommandCallback.permissionCallback(commandSender);
 
         if (main.gameInfos().state() != GameInfos.GameState.WAITING) return () -> {

@@ -61,6 +61,17 @@ public class Round {
                 final SetUniqueList<SurvivorPlayer> players = main.gameInfos().players();
 
                 final SurvivorPlayer survivorPlayer = players.get(playerNumber);
+
+                if (!survivorPlayer.isOnline()) {
+                    if (playerNumber == players.size() - 1) {
+                        playerNumber = 0;
+                    } else {
+                        playerNumber++;
+                    }
+
+                    return;
+                }
+
                 final Location closestWindow = survivorPlayer.closestWindow();
 
                 final Zombie zombie = NormalZombieEntity.spawn(closestWindow);

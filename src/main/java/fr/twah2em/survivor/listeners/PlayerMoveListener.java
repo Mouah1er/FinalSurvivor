@@ -2,9 +2,11 @@ package fr.twah2em.survivor.listeners;
 
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.event.PlayerEnterCuboidEvent;
-import fr.twah2em.survivor.game.Room;
+import fr.twah2em.survivor.game.GameInfos;
+import fr.twah2em.survivor.game.RoomsManager;
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
 import fr.twah2em.survivor.utils.Cuboid;
+import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.StreamUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -12,10 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.Arrays;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class PlayerMoveListener implements SurvivorListener<PlayerMoveEvent> {
     private final Main main;
@@ -29,23 +27,32 @@ public class PlayerMoveListener implements SurvivorListener<PlayerMoveEvent> {
     public void onEvent(PlayerMoveEvent event) {
         final Player player = event.getPlayer();
 
+        final Location from = event.getFrom();
+        final Location to = event.getTo();
+
         if (player.getGameMode() == GameMode.ADVENTURE) {
-            if (StreamUtils.playerHasPlayerWrapper(player, main.gameInfos().players())) {
-                main.gameInfos().rooms().stream().map(room -> (Supplier<Stream<Cuboid>>) () -> Arrays.stream(room.cuboids())).forEach(supplier -> {
-                    final Location from = event.getFrom();
-                    final Location to = event.getTo();
+            final GameInfos gameInfos = main.gameInfos();
+            if (StreamUtils.playerHasPlayerWrapper(player, gameInfos.players())) {
+                final Cuboid cuboidFrom = Cuboid.fromLocation(gameInfos, from);
+                final Cuboid cuboidTo = Cuboid.fromLocation(gameInfos, to);
 
-                    if (supplier.get().anyMatch(cuboid -> !cuboid.isIn(from))) {
-                        if (supplier.get().anyMatch(cuboid -> cuboid.isIn(to))) {
-                            final Cuboid fromCuboid = supplier.get().filter(cuboid -> cuboid.isIn(from)).findFirst().orElse(null);
-                            final Cuboid toCuboid = supplier.get().filter(cuboid -> cuboid.isIn(to)).findFirst().orElse(null);
+                if (cuboidFrom == null) {
+                    player.sendMessage(Messages.ERROR_OCCURRED);
+                    player.teleport(gameInfos.rooms().get(0).center());
 
-                            if (fromCuboid != null && toCuboid != null) {
-                                Bukkit.getPluginManager().callEvent(new PlayerEnterCuboidEvent(player, fromCuboid, toCuboid));
-                            }
-                        }
-                    }
-                });
+                    return;
+                }
+
+                if (cuboidTo == null) {
+                    player.sendMessage(Messages.AREA_NOT_AUTHORIZED_MESSAGE);
+                    player.teleport(RoomsManager.fromCuboid(gameInfos, cuboidFrom).center());
+
+                    return;
+                }
+
+                if (cuboidTo.compare(cuboidFrom)) return;
+
+                Bukkit.getPluginManager().callEvent(new PlayerEnterCuboidEvent(player, cuboidFrom, cuboidTo));
             }
         }
     }
