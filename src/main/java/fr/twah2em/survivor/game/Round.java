@@ -3,12 +3,12 @@ package fr.twah2em.survivor.game;
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.entities.NormalZombieEntity;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
+import fr.twah2em.survivor.runnables.RoundRunnable;
 import fr.twah2em.survivor.utils.Messages;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Zombie;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -42,57 +42,17 @@ public class Round {
         this.remainingZombies = zombiesToSpawn;
     }
 
-    public void start(Main main) {
+    public void startRound(Main main) {
         Bukkit.broadcast(Messages.ROUND_START_MESSAGE.replaceText(TextReplacementConfig.builder().matchLiteral("%round%").replacement(String.valueOf(round)).build()));
 
-        new BukkitRunnable() {
-            int playerNumber = 0;
-
-            @Override
-            public void run() {
-                if (remainingZombies == 0) {
-                    cancel();
-                    stopWave(main);
-                    return;
-                }
-
-                if (zombiesInMap.size() >= 24 || zombiesToSpawn == 0) return;
-
-                final SetUniqueList<SurvivorPlayer> players = main.gameInfos().players();
-
-                final SurvivorPlayer survivorPlayer = players.get(playerNumber);
-
-                if (!survivorPlayer.isOnline()) {
-                    if (playerNumber == players.size() - 1) {
-                        playerNumber = 0;
-                    } else {
-                        playerNumber++;
-                    }
-
-                    return;
-                }
-
-                final Location closestWindow = survivorPlayer.closestWindow();
-
-                final Zombie zombie = NormalZombieEntity.spawn(closestWindow);
-                zombiesInMap.add(zombie.getUniqueId());
-
-                zombiesToSpawn--;
-
-                if (playerNumber == players.size() - 1) {
-                    playerNumber = 0;
-                } else {
-                    playerNumber++;
-                }
-            }
-        }.runTaskTimer(main, 0, (int) (spawnDelay * 20L));
+        new RoundRunnable(main, this).runTaskTimer(main, 0, (int) (spawnDelay * 20L));
     }
 
-    private void stopWave(Main main) {
+    public void stopRound(Main main) {
         Bukkit.broadcast(Messages.ROUND_END_MESSAGE.replaceText(TextReplacementConfig.builder().matchLiteral("%round%").replacement(String.valueOf(round)).build()));
         Bukkit.getScheduler().runTaskLater(main, () -> {
             calculateRoundInfos();
-            start(main);
+            startRound(main);
         }, 30 * 20);
     }
 

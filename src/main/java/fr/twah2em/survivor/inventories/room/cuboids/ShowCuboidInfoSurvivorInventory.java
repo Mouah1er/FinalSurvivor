@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class ShowCuboidInfoSurvivorInventory {
 
     public Consumer<InventoryOpenEvent> openConsumer() {
         return event -> {
-            final BukkitTask bukkitTask = main.gameInfos().cuboidParticlesTask();
+            final BukkitRunnable bukkitTask = main.gameInfos().cuboidParticlesTask();
             System.out.println("test");
             if (bukkitTask != null) {
                 System.out.println(bukkitTask.getTaskId());

@@ -34,7 +34,7 @@ public class GameLogic {
         final Round round = main.gameInfos().round();
 
         round.calculateRoundInfos();
-        round.start(main);
+        round.startRound(main);
         main.gameInfos().state(GameInfos.GameState.PLAYING);
     }
 

@@ -1,14 +1,17 @@
 package fr.twah2em.survivor.utils;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.game.GameInfos;
 import fr.twah2em.survivor.inventories.ItemBuilder;
-import org.bukkit.*;
+import fr.twah2em.survivor.runnables.CuboidEdgesRunnable;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -96,17 +99,15 @@ public class Cuboid {
         return bL.iterator();
     }
 
-    public BukkitTask showEdges(Player player, Main main) {
-        final AtomicReference<BukkitTask> bukkitTask = new AtomicReference<>();
+    public BukkitRunnable showEdges(Player player, Main main) {
+        final AtomicReference<BukkitRunnable> bukkitTask = new AtomicReference<>();
 
         final Color color = Color.fromRGB((int) (Math.random() * 0x1000000)); // random color
-        this.edgesList().forEach(location -> bukkitTask.set(Bukkit.getScheduler().runTaskTimer(main, () -> new ParticleBuilder(Particle.REDSTONE)
-                        .color(color)
-                        .location(location)
-                        .receivers(player)
-                        .spawn(),
-                0, 5))
-        );
+        this.edgesList().forEach(location -> {
+            final CuboidEdgesRunnable runnable = new CuboidEdgesRunnable(color, location, player);
+            runnable.runTaskTimer(main, 0, 10);
+            bukkitTask.set(runnable);
+        });
 
         System.out.println(bukkitTask.get().getTaskId());
 

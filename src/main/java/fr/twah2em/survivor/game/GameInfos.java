@@ -3,6 +3,7 @@ package fr.twah2em.survivor.game;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -16,7 +17,7 @@ public class GameInfos {
     private final List<Room> rooms;
     private GameState state;
 
-    private BukkitTask cuboidParticlesTask = null;
+    private BukkitRunnable cuboidParticlesTask = null;
 
     public GameInfos(FileConfiguration config) {
         this.players = SetUniqueList.setUniqueList(new ArrayList<>());
@@ -51,11 +52,11 @@ public class GameInfos {
         return rooms;
     }
 
-    public BukkitTask cuboidParticlesTask() {
+    public BukkitRunnable cuboidParticlesTask() {
         return cuboidParticlesTask;
     }
 
-    public void cuboidParticlesTask(BukkitTask cuboidParticlesTask) {
+    public void cuboidParticlesTask(BukkitRunnable cuboidParticlesTask) {
         this.cuboidParticlesTask = cuboidParticlesTask;
     }
 
