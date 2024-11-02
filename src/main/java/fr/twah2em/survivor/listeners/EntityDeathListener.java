@@ -10,6 +10,8 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import java.util.UUID;
+
 public class EntityDeathListener implements SurvivorListener<EntityDeathEvent> {
     private final Main main;
 
@@ -24,14 +26,12 @@ public class EntityDeathListener implements SurvivorListener<EntityDeathEvent> {
 
         if (entity instanceof Zombie) {
             final Player killer = event.getEntity().getKiller();
+            final UUID entityUniqueId = entity.getUniqueId();
 
             if (killer != null) {
-                if (main.gameInfos().round().zombiesInMap().contains(entity.getUniqueId())) {
+                if (main.gameInfos().round().zombiesInMap().contains(entityUniqueId)) {
                     event.setDroppedExp(0);
                     event.getDrops().clear();
-                    SurvivorPlayer.survivorPlayer(killer, main.gameInfos().players()).addPoints(90);
-                    main.gameInfos().round().zombieKilled(entity.getUniqueId());
-                    killer.sendMessage(Messages.ZOMBIE_KILLED_MESSAGE);
                 }
             }
         }

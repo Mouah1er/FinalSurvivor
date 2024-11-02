@@ -2,10 +2,10 @@ package fr.twah2em.survivor.listeners;
 
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.game.GameInfos;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
 import fr.twah2em.survivor.utils.Messages;
-import fr.twah2em.survivor.utils.StreamUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,17 +36,23 @@ public class PlayerQuitListener implements SurvivorListener<PlayerQuitEvent> {
 
             main.gameInfos().players().remove(SurvivorPlayer.survivorPlayer(player, main.gameInfos().players()));
         } else {
-            if (Bukkit.getOnlinePlayers().isEmpty()) {
+            if (Bukkit.getOnlinePlayers().size() == 1) {
                 Bukkit.broadcast(Messages.EMPTY_GAME);
                 Bukkit.shutdown();
             }
-            if (StreamUtils.playerHasPlayerWrapper(player, main.gameInfos().players())) {
+            if (SurvivorPlayer.playerIsSurvivorPlayer(player, main.gameInfos().players())) {
                 event.quitMessage(text("[", GRAY)
                         .append(text("-", RED))
                         .append(text("] ", GRAY))
                         .append(text(player.getName(), AQUA))
                         .append(text(" s'est déconnecté, il peut cependant revenir.", GREEN)));
             }
+
+            main.gameInfos().spectators().remove(player);
+        }
+
+        if (RoomsManager.CREATING_ROOM != null && RoomsManager.CREATING_ROOM.left().getName().equals(player.getName())) {
+            RoomsManager.CREATING_ROOM = null;
         }
     }
 }

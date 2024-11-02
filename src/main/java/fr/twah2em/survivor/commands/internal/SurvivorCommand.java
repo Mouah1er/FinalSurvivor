@@ -20,9 +20,9 @@ public abstract class SurvivorCommand extends Command {
         this.setPermission(hasPermission ? null : commandMetadata.permission());
     }
 
-    public abstract void execute(CommandSender commandSender, String[] args);
+    public abstract void execute(CommandSender sender, String[] args);
 
-    public abstract SurvivorCommandCallback shouldBeExecuted(CommandSender commandSender, String[] args);
+    public abstract SurvivorCommandCallback shouldBeExecuted(CommandSender sender, String[] args);
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
@@ -33,13 +33,13 @@ public abstract class SurvivorCommand extends Command {
         return shouldBeExecuted;
     }
 
-    protected void executeSubCommand(int index, CommandSender commandSender, String[] args) {
+    protected void executeSubCommand(int index, CommandSender sender, String[] args) {
         final SurvivorSubCommand subCommand = commandMetadata.subCommands().get(index);
 
         if (subCommand != null) {
-            final boolean shouldBeExecuted = subCommand.shouldBeExecuted(commandSender, args).call();
+            final boolean shouldBeExecuted = subCommand.shouldBeExecuted(sender, args).call();
 
-            if (shouldBeExecuted) subCommand.execute(commandSender, args);
+            if (shouldBeExecuted) subCommand.execute(sender, args);
         }
     }
 

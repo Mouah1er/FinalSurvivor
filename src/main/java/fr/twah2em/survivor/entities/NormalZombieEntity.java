@@ -1,5 +1,6 @@
 package fr.twah2em.survivor.entities;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Zombie;
@@ -13,24 +14,24 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class NormalZombieEntity {
 
-    public static Zombie spawn(Location location) {
+    public static Zombie spawn(double health, Location location) {
         final Zombie zombie = location.getWorld().spawn(location, Zombie.class);
-        metadata(zombie);
+        metadata(health, zombie);
 
         return zombie;
     }
 
-    private static void metadata(Zombie zombie) {
-        zombie.customName(text("§eZombie ", YELLOW)
-                .append(text("[", GRAY))
-                .append(text(zombie.getHealth() + "❤", RED))
-                .append(text("]", GRAY)));
-        zombie.setCustomNameVisible(true);
-        zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-        zombie.setHealth(20);
+    private static void metadata(double health, Zombie zombie) {
+        zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(/*health*/20);
+        zombie.setHealth(/*health*/20);
         zombie.getPassengers().forEach(zombie::removePassenger);
         zombie.setAdult();
         zombie.setShouldBurnInDay(false);
+        zombie.setCanPickupItems(false);
+        zombie.clearActiveItem();
+        zombie.setMaximumNoDamageTicks(0);
+        zombie.customName(customName(zombie.getHealth()));
+        zombie.setCustomNameVisible(true);
     }
 
     public static void updateName(EntityDamageEvent event, Zombie zombie, double damage) {
@@ -40,16 +41,17 @@ public class NormalZombieEntity {
             final double health = new BigDecimal(String.valueOf(zombie.getHealth()))
                     .setScale(1, RoundingMode.HALF_DOWN)
                     .doubleValue();
-            zombie.customName(text("§eZombie ", YELLOW)
-                    .append(text("[", GRAY))
-                    .append(text(health + "❤", RED))
-                    .append(text("]", GRAY)));
+            zombie.customName(customName(health));
         } else {
             zombie.setHealth(0);
-            zombie.customName(text("§eZombie ", YELLOW)
-                    .append(text("[", GRAY))
-                    .append(text("0❤", RED))
-                    .append(text("]", GRAY)));
+            zombie.customName(customName(0));
         }
+    }
+
+    private static Component customName(double health) {
+        return text("§eZombie ", YELLOW)
+                .append(text("[", GRAY))
+                .append(text(health + "❤", RED))
+                .append(text("]", GRAY));
     }
 }

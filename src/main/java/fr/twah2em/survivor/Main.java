@@ -2,11 +2,13 @@ package fr.twah2em.survivor;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import fr.twah2em.survivor.commands.weapons.GiveWeaponCommand;
 import fr.twah2em.survivor.commands.start.StartCommand;
 import fr.twah2em.survivor.commands.internal.SurvivorCommandRegistration;
 import fr.twah2em.survivor.commands.room.RoomCommand;
 import fr.twah2em.survivor.game.GameInfos;
 import fr.twah2em.survivor.game.GameLogic;
+import fr.twah2em.survivor.game.player.ScoreboardManager;
 import fr.twah2em.survivor.listeners.*;
 import fr.twah2em.survivor.listeners.internal.SurvivorListenerRegistration;
 import fr.twah2em.survivor.listeners.internal.inventories.InventoryClickListener;
@@ -26,13 +28,14 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("Main plugin is starting !");
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
+        //this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         saveDefaultConfig();
 
         SurvivorCommandRegistration.registerCommands(this,
                 StartCommand::new,
-                RoomCommand::new
+                RoomCommand::new,
+                GiveWeaponCommand::new
         );
         SurvivorListenerRegistration.registerListeners(this,
                 InventoryClickListener::new,
@@ -41,7 +44,7 @@ public final class Main extends JavaPlugin {
                 AsyncChatListener::new,
                 PlayerJoinListener::new,
                 PlayerQuitListener::new,
-                EntityDamageListener::new,
+                EntityDamageByEntityListener::new,
                 EntityDeathListener::new,
                 PlayerMoveListener::new,
                 PlayerEnterCuboidListener::new,
@@ -51,7 +54,8 @@ public final class Main extends JavaPlugin {
         );
 
         this.gameLogic = new GameLogic(this);
-        this.gameInfos = new GameInfos(this.getConfig());
+        this.gameInfos = new GameInfos(this, this.getConfig());
+        new ScoreboardManager(this);
     }
 
     @Override

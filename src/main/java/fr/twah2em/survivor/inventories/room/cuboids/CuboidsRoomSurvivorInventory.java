@@ -1,14 +1,14 @@
 package fr.twah2em.survivor.inventories.room.cuboids;
 
 import fr.twah2em.survivor.Main;
-import fr.twah2em.survivor.game.Room;
-import fr.twah2em.survivor.game.RoomsManager;
+import fr.twah2em.survivor.game.rooms.Room;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.inventories.ItemBuilder;
 import fr.twah2em.survivor.inventories.SurvivorInventory;
 import fr.twah2em.survivor.inventories.room.RoomCreateSurvivorInventory;
 import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.Pair;
-import fr.twah2em.survivor.utils.StreamUtils;
+import fr.twah2em.survivor.utils.items.Items;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -92,20 +91,7 @@ public class CuboidsRoomSurvivorInventory {
             if (type == Material.WOODEN_AXE) {
                 player.closeInventory();
 
-                player.getInventory().addItem(new ItemBuilder(Material.WOODEN_AXE)
-                        .withName("§aCréateur de cuboids")
-                        .withLore("§7§oComme avec World Edit, le premier clique gauche",
-                                "§7§opermet de définir le point n°1 du cuboid et le",
-                                "§7§osecond clique gauche le point n°2 !",
-                                "§7§o",
-                                "§7§oAppuyez sur votre touche de drop pour annuler",
-                                "§7§ola prise en compte du dernier point défini.",
-                                "§7§oSi aucun point défini, alors le menu de la",
-                                "§7§ocréation de cuboid va vous être rouvert et",
-                                "§7§ovous allez perdre la hache.",
-                                "§7§oClique droit pour valider la sélection.")
-                        .withPersistentData("survivor", "cuboid_wand", true, PersistentDataType.BOOLEAN)
-                        .build());
+                player.getInventory().addItem(Items.WAND.build());
 
                 return;
             }
@@ -123,12 +109,15 @@ public class CuboidsRoomSurvivorInventory {
                     return;
                 }
 
+                player.closeInventory();
+                player.getInventory().addItem(Items.RETURN_CUBOIDS_GUI.build());
+
                 Arrays.stream(creatingRoom.cuboids()).forEach(cuboid -> cuboid.showEdges(player, main));
 
                 return;
             }
 
-            player.openInventory(inventoryFrom.survivorInventory().getInventory());
+            player.openInventory(new RoomCreateSurvivorInventory(main).survivorInventory().getInventory());
         };
     }
 

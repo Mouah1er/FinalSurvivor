@@ -2,6 +2,11 @@ package fr.twah2em.survivor.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.util.NumberConversions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocationUtils {
     public static Location locationFromString(String string) {
@@ -23,6 +28,18 @@ public class LocationUtils {
     }
 
     public static String prettyLocationToString(Location location) {
-        return "§ax: " + location.getX() + "§a, §ey: " + location.getY() + "§a, §6z: " + location.getZ();
+        return "§ex: " + location.getX() + "§a, §6y: " + location.getY() + "§a, §cz: " + location.getZ();
+    }
+
+    public static List<Entity> entitiesByLocation(Location loc, float xRadius, float yRadius, float zRadius) {
+        return new ArrayList<>(loc.getWorld().getNearbyEntities(loc, xRadius, yRadius, zRadius));
+    }
+
+    private static boolean isWithinBounds(Location center, Location entityLocation, double radiusX, double radiusY, double radiusZ) {
+        double dx = Math.abs(center.getX() - entityLocation.getX());
+        double dy = Math.abs(center.getY() - entityLocation.getY());
+        double dz = Math.abs(center.getZ() - entityLocation.getZ());
+
+        return dx <= radiusX && dy <= radiusY && dz <= radiusZ;
     }
 }

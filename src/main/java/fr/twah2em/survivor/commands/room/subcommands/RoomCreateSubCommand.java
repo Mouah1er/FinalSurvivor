@@ -3,10 +3,9 @@ package fr.twah2em.survivor.commands.room.subcommands;
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.commands.internal.SurvivorCommandCallback;
 import fr.twah2em.survivor.commands.internal.SurvivorSubCommand;
-import fr.twah2em.survivor.game.RoomsManager;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.inventories.room.RoomCreateSurvivorInventory;
 import fr.twah2em.survivor.utils.Messages;
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,12 +26,7 @@ public class RoomCreateSubCommand extends SurvivorSubCommand {
     @Override
     public SurvivorCommandCallback shouldBeExecuted(CommandSender sender, String[] args) {
         if (RoomsManager.CREATING_ROOM != null) return () -> {
-            sender.sendMessage(Messages.CANNOT_CREATE_ROOM.replaceText(
-                    TextReplacementConfig.builder()
-                            .matchLiteral("%player%")
-                            .replacement(RoomsManager.CREATING_ROOM.left().getName())
-                            .build())
-            );
+            sender.sendMessage(Messages.CANNOT_CREATE_ROOM(RoomsManager.CREATING_ROOM.left().getName()));
 
             return false;
         };

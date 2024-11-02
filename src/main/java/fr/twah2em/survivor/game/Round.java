@@ -4,17 +4,23 @@ import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.entities.NormalZombieEntity;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
 import fr.twah2em.survivor.utils.Messages;
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class Round {
+    private final Main main;
+
     private final GameInfos gameInfos;
 
     private final List<SurvivorPlayer> deadPlayers = new ArrayList<>();
@@ -28,7 +34,9 @@ public class Round {
 
     private final List<UUID> zombiesInMap;
 
-    public Round(GameInfos gameInfos) {
+    public Round(Main main, GameInfos gameInfos) {
+        this.main = main;
+
         this.gameInfos = gameInfos;
         this.zombiesInMap = new ArrayList<>();
     }
@@ -42,21 +50,16 @@ public class Round {
         this.remainingZombies = zombiesToSpawn;
     }
 
-    public void start(Main main) {
-        Bukkit.broadcast(Messages.ROUND_START_MESSAGE.replaceText(TextReplacementConfig.builder().matchLiteral("%round%").replacement(String.valueOf(round)).build()));
+    public void start() {
+        Bukkit.broadcast(Messages.ROUND_START_MESSAGE(String.valueOf(round)));
 
         new BukkitRunnable() {
             int playerNumber = 0;
 
             @Override
             public void run() {
-                if (remainingZombies == 0) {
-                    cancel();
-                    stopWave(main);
-                    return;
-                }
-
-                if (zombiesInMap.size() >= 24 || zombiesToSpawn == 0) return;
+                if (zombiesInMap.size() >= 24) return;
+                if (zombiesToSpawn <= 0) cancel();
 
                 final SetUniqueList<SurvivorPlayer> players = main.gameInfos().players();
 
@@ -72,12 +75,19 @@ public class Round {
                     return;
                 }
 
-                final Location closestWindow = survivorPlayer.closestWindow();
+                final Location[] zombieSpawnLocations = survivorPlayer.room().windows();
 
-                final Zombie zombie = NormalZombieEntity.spawn(closestWindow);
-                zombiesInMap.add(zombie.getUniqueId());
+                for (final Location zombieSpawnLocation : zombieSpawnLocations) {
+                    if (zombiesToSpawn <= 0) {
+                        cancel();
+                        break;
+                    }
 
-                zombiesToSpawn--;
+                    final Zombie zombie = NormalZombieEntity.spawn(zombieHealth, zombieSpawnLocation);
+                    zombiesInMap.add(zombie.getUniqueId());
+
+                    zombiesToSpawn--;
+                }
 
                 if (playerNumber == players.size() - 1) {
                     playerNumber = 0;
@@ -88,12 +98,15 @@ public class Round {
         }.runTaskTimer(main, 0, (int) (spawnDelay * 20L));
     }
 
-    private void stopWave(Main main) {
-        Bukkit.broadcast(Messages.ROUND_END_MESSAGE.replaceText(TextReplacementConfig.builder().matchLiteral("%round%").replacement(String.valueOf(round)).build()));
+    private void stop() {
+        Bukkit.broadcast(Messages.ROUND_END_MESSAGE(String.valueOf(round)));
         Bukkit.getScheduler().runTaskLater(main, () -> {
-            calculateRoundInfos();
-            start(main);
-        }, 30 * 20);
+            Bukkit.broadcast(Messages.TEN_SEC_REMAINING);
+            Bukkit.getScheduler().runTaskLater(main, () -> {
+                calculateRoundInfos();
+                start();
+            }, 10 * 20);
+        }, 20 * 20);
     }
 
     private void calculateRoundNumber() {
@@ -148,17 +161,7 @@ public class Round {
     }
 
     private void calculateZombieSpawnDelay() {
-        this.spawnDelay = 2.0;
-
-        if (round > 1) {
-            for (int i = 1; i < round; i++) {
-                spawnDelay *= 0.95;
-
-                if (spawnDelay < 0.08) {
-                    spawnDelay = 0.08;
-                }
-            }
-        }
+        this.spawnDelay = Math.max(2 * Math.pow(0.95, round - 1), 0.1);
     }
 
     public List<SurvivorPlayer> deadPlayers() {
@@ -173,7 +176,7 @@ public class Round {
         return activeBonuses;
     }
 
-    public int round() {
+    public int roundNumber() {
         return round;
     }
 
@@ -193,9 +196,25 @@ public class Round {
         this.remainingZombies = remainingZombies;
     }
 
-    public void zombieKilled(UUID uniqueId) {
+    public void zombieKilled(EntityDamageEvent event, Player killer, Zombie zombie) {
+        NormalZombieEntity.updateName(event, zombie, event.getFinalDamage());
+
         this.remainingZombies(this.remainingZombies() - 1);
-        zombiesInMap().remove(uniqueId);
+        zombiesInMap().remove(zombie.getUniqueId());
+
+        final SurvivorPlayer survivorPlayer = SurvivorPlayer.survivorPlayer(killer, main.gameInfos().players());
+        survivorPlayer.addPoints(60);
+        survivorPlayer.addKill();
+        killer.sendMessage(Messages.ZOMBIE_KILLED_MESSAGE);
+
+        if (remainingZombies() == 0) stop();
+    }
+
+    public void zombieDamaged(EntityDamageEvent event, Player damager, Zombie zombie) {
+        NormalZombieEntity.updateName(event, zombie, event.getFinalDamage());
+
+        SurvivorPlayer.survivorPlayer(damager, main.gameInfos().players()).addPoints(10);
+        damager.sendMessage(Messages.ZOMBIE_HIT_MESSAGE);
     }
 
     public double spawnDelay() {

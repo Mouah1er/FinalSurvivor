@@ -1,13 +1,14 @@
 package fr.twah2em.survivor.listeners;
 
 import fr.twah2em.survivor.Main;
-import fr.twah2em.survivor.game.RoomsManager;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.inventories.ItemBuilder;
 import fr.twah2em.survivor.inventories.room.RoomCreateSurvivorInventory;
 import fr.twah2em.survivor.inventories.room.cuboids.CuboidsRoomSurvivorInventory;
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
 import fr.twah2em.survivor.utils.Cuboid;
 import fr.twah2em.survivor.utils.Messages;
+import fr.twah2em.survivor.utils.items.Items;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -27,11 +28,16 @@ public class PlayerDropItemListener implements SurvivorListener<PlayerDropItemEv
         final Player player = event.getPlayer();
         final Item itemDrop = event.getItemDrop();
 
+        handleWand(event, player, itemDrop);
+        handleCuboidSign(event, player, itemDrop);
+    }
+
+    private void handleWand(PlayerDropItemEvent event, Player player, Item itemDrop) {
         if (itemDrop.getItemStack().getType() != Material.WOODEN_AXE) return;
 
-        final ItemBuilder dropItemBuilder = new ItemBuilder(itemDrop.getItemStack());
+        final ItemBuilder itemDropBuilder = new ItemBuilder(itemDrop.getItemStack());
 
-        if (!dropItemBuilder.isWand()) return;
+        if (!itemDropBuilder.isSimilar(Items.WAND)) return;
 
         if (RoomsManager.CREATING_ROOM == null || !RoomsManager.CREATING_ROOM.left().getUniqueId().equals(player.getUniqueId())) {
             itemDrop.remove();
@@ -39,8 +45,8 @@ public class PlayerDropItemListener implements SurvivorListener<PlayerDropItemEv
             return;
         }
 
-        final String cuboidLoc1 = dropItemBuilder.cuboid1();
-        final String cuboidLoc2 = dropItemBuilder.cuboid2();
+        final String cuboidLoc1 = itemDropBuilder.cuboid1();
+        final String cuboidLoc2 = itemDropBuilder.cuboid2();
 
         if (cuboidLoc1 == null || cuboidLoc1.isEmpty()) {
             itemDrop.remove();
@@ -54,7 +60,7 @@ public class PlayerDropItemListener implements SurvivorListener<PlayerDropItemEv
         if (cuboidLoc2 == null || cuboidLoc2.isEmpty()) {
             event.setCancelled(true);
 
-            Cuboid.emptyCuboidInItem(dropItemBuilder, 1);
+            Cuboid.emptyCuboidInItem(itemDropBuilder, 1);
 
             player.sendMessage(Messages.CUBOID_1_SUCCESSFULLY_REMOVED);
 
@@ -63,10 +69,19 @@ public class PlayerDropItemListener implements SurvivorListener<PlayerDropItemEv
 
         event.setCancelled(true);
 
-        Cuboid.emptyCuboidInItem(dropItemBuilder, 2);
+        Cuboid.emptyCuboidInItem(itemDropBuilder, 2);
 
         player.sendMessage(Messages.CUBOID_2_SUCCESSFULLY_REMOVED);
     }
 
-    // TODO: FAIRE UN SYSTEME DE CLIQUE DROIT AVEC HACHE QUI PERMET D'OUVRIR UN MENU ET VALIDER LE CUBOID
+    private void handleCuboidSign(PlayerDropItemEvent event, Player player, Item itemDrop) {
+        if (itemDrop.getItemStack().getType() != Material.OAK_SIGN) return;
+
+        final ItemBuilder itemDropBuilder = new ItemBuilder(itemDrop.getItemStack());
+
+        if (!itemDropBuilder.isSimilar(Items.RETURN_CUBOIDS_GUI)) return;
+
+        event.setCancelled(true);
+        player.sendMessage(Messages.CANT_DROP);
+    }
 }

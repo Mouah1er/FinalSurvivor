@@ -1,24 +1,23 @@
 package fr.twah2em.survivor.inventories.room.cuboids;
 
 import fr.twah2em.survivor.Main;
-import fr.twah2em.survivor.game.Room;
-import fr.twah2em.survivor.game.RoomsManager;
+import fr.twah2em.survivor.game.rooms.Room;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.inventories.ItemBuilder;
 import fr.twah2em.survivor.inventories.SurvivorInventory;
+import fr.twah2em.survivor.inventories.room.RoomCreateSurvivorInventory;
 import fr.twah2em.survivor.utils.Cuboid;
 import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -86,13 +85,10 @@ public class ShowCuboidInfoSurvivorInventory {
 
             if (type == Material.GREEN_DYE) {
                 final Room creatingRoom = RoomsManager.CREATING_ROOM.right();
+                creatingRoom.addCuboid(cuboid, player);
 
-                final List<Cuboid> cuboids = new ArrayList<>(Arrays.stream(creatingRoom.cuboids()).toList());
-                cuboids.add(cuboid);
-
-                creatingRoom.cuboids(cuboids.toArray(new Cuboid[0]));
-
-                player.sendMessage(Messages.CUBOID_SUCCESSFULLY_CREATED);
+                final Inventory previousInventory = new RoomCreateSurvivorInventory(main).survivorInventory().getInventory();
+                player.openInventory(previousInventory);
 
                 return;
             }
@@ -104,13 +100,8 @@ public class ShowCuboidInfoSurvivorInventory {
     public Consumer<InventoryOpenEvent> openConsumer() {
         return event -> {
             final BukkitTask bukkitTask = main.gameInfos().cuboidParticlesTask();
-            System.out.println("test");
             if (bukkitTask != null) {
-                System.out.println(bukkitTask.getTaskId());
                 bukkitTask.cancel();
-                System.out.println(Bukkit.getScheduler().getPendingTasks().stream()
-                        .filter(bukkitTask1 -> bukkitTask1.getOwner().getName().equals(Main.getPlugin(Main.class).getName()))
-                        .map(BukkitTask::getTaskId).toList());
             }
         };
     }

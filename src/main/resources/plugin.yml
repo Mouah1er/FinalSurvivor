@@ -1,7 +1,6 @@
 name: 'Survivor'
 version: '1.0.0'
 main: fr.twah2em.survivor.Main
-api-version: '1.19'
+api-version: '1.20'
 authors: [Twah2em]
 description: "Plugin Survivor, inspiré par le minijeu d'Epicube."
-depend: [ ProtocolLib ]

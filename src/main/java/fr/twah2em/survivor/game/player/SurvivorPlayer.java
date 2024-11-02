@@ -1,18 +1,13 @@
 package fr.twah2em.survivor.game.player;
 
-import com.mojang.brigadier.Message;
-import fr.twah2em.survivor.game.GameInfos;
-import fr.twah2em.survivor.game.Room;
+import fr.mrmicky.fastboard.adventure.FastBoard;
+import fr.twah2em.survivor.game.rooms.Room;
 import fr.twah2em.survivor.utils.Cuboid;
-import fr.twah2em.survivor.utils.Messages;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class SurvivorPlayer {
     private final UUID uuid;
@@ -25,9 +20,13 @@ public class SurvivorPlayer {
     private Room room = null;
     private Cuboid cuboid = null;
 
+    private FastBoard board;
+
     public SurvivorPlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
+
+        this.board = new FastBoard(Bukkit.getPlayer(uuid));
     }
 
     public SurvivorPlayer(Player player) {
@@ -50,12 +49,20 @@ public class SurvivorPlayer {
         this.kills = kills;
     }
 
+    public void addKill() {
+        kills(kills() + 1);
+    }
+
     public int deaths() {
         return deaths;
     }
 
     public void deaths(int deaths) {
         this.deaths = deaths;
+    }
+
+    public void addDeath() {
+        deaths(deaths() + 1);
     }
 
     public int points() {
@@ -106,20 +113,12 @@ public class SurvivorPlayer {
         return player() != null;
     }
 
-    public Location closestWindow() {
-        Location closestWindow = null;
+    public FastBoard board() {
+        return board;
+    }
 
-        for (Location window : room.windows()) {
-            if (closestWindow == null) {
-                closestWindow = window;
-            } else {
-                if (player().getLocation().distanceSquared(window) < player().getLocation().distanceSquared(closestWindow)) {
-                    closestWindow = window;
-                }
-            }
-        }
-
-        return closestWindow;
+    public void board(FastBoard board) {
+        this.board = board;
     }
 
     public static boolean playerIsSurvivorPlayer(Player player, List<SurvivorPlayer> players) {

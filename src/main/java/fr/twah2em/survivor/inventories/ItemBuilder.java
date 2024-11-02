@@ -1,5 +1,7 @@
 package fr.twah2em.survivor.inventories;
 
+import fr.twah2em.survivor.utils.items.ItemUtils;
+import fr.twah2em.survivor.utils.items.Items;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -64,6 +66,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder withEnchant(Enchantment enchantment, int level) {
+        if (enchantment == null) return this;
+
         this.meta.addEnchant(enchantment, level, true);
         return this;
     }
@@ -174,8 +178,16 @@ public class ItemBuilder {
         return this.meta.getPersistentDataContainer().get(new NamespacedKey(namespace, key), persistentDataType);
     }
 
-    public boolean isWand() {
-        return this.persistentData("survivor", "cuboid_wand", PersistentDataType.BOOLEAN) != null;
+    public <T> boolean hasPersistentData(String namespace, String key, PersistentDataType<?, T> persistentDataType) {
+        return this.meta.getPersistentDataContainer().has(new NamespacedKey(namespace, key), persistentDataType);
+    }
+
+    public <T> boolean hasPersistentData(String namespace, String key) {
+        return this.meta.getPersistentDataContainer().has(new NamespacedKey(namespace, key));
+    }
+
+    public boolean isSimilar(ItemBuilder itemBuilder) {
+        return this.build().isSimilar(itemBuilder.build());
     }
 
     public String cuboid1() {

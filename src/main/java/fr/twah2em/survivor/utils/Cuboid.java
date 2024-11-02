@@ -100,17 +100,12 @@ public class Cuboid {
         final AtomicReference<BukkitTask> bukkitTask = new AtomicReference<>();
 
         final Color color = Color.fromRGB((int) (Math.random() * 0x1000000)); // random color
-        this.edgesList().forEach(location -> bukkitTask.set(Bukkit.getScheduler().runTaskTimer(main, () -> new ParticleBuilder(Particle.REDSTONE)
+        bukkitTask.set(Bukkit.getScheduler().runTaskTimer(main, () -> this.edgesList().forEach(location -> new ParticleBuilder(Particle.DUST)
                         .color(color)
                         .location(location)
                         .receivers(player)
-                        .spawn(),
-                0, 5))
-        );
-
-        System.out.println(bukkitTask.get().getTaskId());
-
-        Bukkit.getScheduler().runTaskLater(main, () -> Bukkit.getScheduler().cancelTask(bukkitTask.get().getTaskId()), 40);
+                        .spawn()),
+                0, 20));
 
         return bukkitTask.get();
     }

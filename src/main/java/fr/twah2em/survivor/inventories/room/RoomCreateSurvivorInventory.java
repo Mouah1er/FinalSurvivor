@@ -1,11 +1,12 @@
 package fr.twah2em.survivor.inventories.room;
 
 import fr.twah2em.survivor.Main;
-import fr.twah2em.survivor.game.Room;
-import fr.twah2em.survivor.game.RoomsManager;
+import fr.twah2em.survivor.game.rooms.Room;
+import fr.twah2em.survivor.game.rooms.RoomsManager;
 import fr.twah2em.survivor.inventories.ItemBuilder;
 import fr.twah2em.survivor.inventories.SurvivorInventory;
 import fr.twah2em.survivor.inventories.room.cuboids.CuboidsRoomSurvivorInventory;
+import fr.twah2em.survivor.utils.Cuboid;
 import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.Pair;
 import org.bukkit.Material;
@@ -31,8 +32,8 @@ public class RoomCreateSurvivorInventory {
                 .withGlassInEmptySlots()
                 .withClickConsumer(clickConsumer(main))
                 .withOpenConsumer(openConsumer())
-                .withCloseConsumer(closeConsumer())
-                ;
+                .withCloseConsumer(closeConsumer());
+
         this.isClosed = true;
     }
 
@@ -41,6 +42,8 @@ public class RoomCreateSurvivorInventory {
     }
 
     private List<Pair<Integer, ItemStack>> items() {
+        final String roomName = (RoomsManager.CREATING_ROOM == null ? "Aucun" : RoomsManager.CREATING_ROOM.right().name());
+
         return List.of(
                 Pair.of(2, new ItemBuilder(Material.WOODEN_AXE)
                         .withName("§aCuboids de la pièces")
@@ -54,7 +57,7 @@ public class RoomCreateSurvivorInventory {
                                 "§7§odans la pièce.")
                         .build()),
                 Pair.of(5, new ItemBuilder(Material.OAK_SIGN)
-                        .withName("§aNom de la pièce")
+                        .withName("§aNom de la pièce: §b" + roomName)
                         .withLore("§7§oPermet de définir le nom de la pièce.")
                         .build()),
                 Pair.of(6, new ItemBuilder(Material.REDSTONE)
@@ -103,7 +106,11 @@ public class RoomCreateSurvivorInventory {
     }
 
     private Consumer<InventoryOpenEvent> openConsumer() {
-        return event -> RoomsManager.CREATING_ROOM = Pair.of((Player) event.getPlayer(), new Room(-1, null, null, null, null));
+        return event -> {
+            if (RoomsManager.CREATING_ROOM == null) {
+                RoomsManager.CREATING_ROOM = Pair.of((Player) event.getPlayer(), new Room(-1, "Aucun", new Cuboid[0], null, null));
+            }
+        };
     }
 
     private Consumer<InventoryCloseEvent> closeConsumer() {

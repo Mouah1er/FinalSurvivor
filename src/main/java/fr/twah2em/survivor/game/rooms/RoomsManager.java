@@ -1,5 +1,6 @@
-package fr.twah2em.survivor.game;
+package fr.twah2em.survivor.game.rooms;
 
+import fr.twah2em.survivor.game.GameInfos;
 import fr.twah2em.survivor.utils.Cuboid;
 import fr.twah2em.survivor.utils.LocationUtils;
 import fr.twah2em.survivor.utils.Pair;
