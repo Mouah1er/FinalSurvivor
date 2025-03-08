@@ -1,12 +1,11 @@
 package fr.twah2em.survivor.game.weapons;
 
+import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.inventories.ItemBuilder;
 import fr.twah2em.survivor.utils.LocationUtils;
 import fr.twah2em.survivor.utils.SoundWrapper;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -14,7 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 public class Weapon {
     private final String name;
@@ -30,12 +32,10 @@ public class Weapon {
     private final AmmoRange ammoRange;
     private final String upgradedOrDowngradedWeaponName;
     private final boolean isUpgraded;
+    private final ItemBuilder itemBuilder;
 
-    private final int ammoInClip;
-    private final int totalRemainingAmmo;
-
-    public Weapon(String name, int clipSize, int totalAmmo, double damage, double reloadTime, double reloadTimeEmpty, double rateOfFire, AmmoType ammoType,
-                  Material material, SoundWrapper shootSound, AmmoRange ammoRange, String upgradedOrDowngradedWeaponName, boolean isUpgraded) {
+    public Weapon(String name, int clipSize, int totalAmmo, double damage, double reloadTime, double reloadTimeEmpty, double rateOfFire,
+                  AmmoType ammoType, Material material, SoundWrapper shootSound, AmmoRange ammoRange, String upgradedOrDowngradedWeaponName, boolean isUpgraded) {
         this.name = name;
         this.clipSize = clipSize;
         this.totalAmmo = totalAmmo;
@@ -50,11 +50,18 @@ public class Weapon {
         this.upgradedOrDowngradedWeaponName = upgradedOrDowngradedWeaponName;
         this.isUpgraded = isUpgraded;
 
-        //System.out.println(Integer.parseInt(weaponItemBuilder().persistentData("survivor", "weapon_ammo_in_clip", PersistentDataType.STRING)));
-
-
-        this.ammoInClip = ammoInClip();
-        this.totalRemainingAmmo = totalRemainingAmmo();
+        this.itemBuilder = new ItemBuilder(material)
+                .withPersistentData("survivor", "weapon_ammo_in_clip", clipSize, PersistentDataType.INTEGER)
+                .withPersistentData("survivor", "weapon_total_remaining_ammo", totalAmmo, PersistentDataType.INTEGER)
+                .withPersistentData("survivor", "weapon_name", name(), PersistentDataType.STRING)
+                .withName("§3" + name + " §6- §f" + clipSize + "§e/§7" + totalAmmo)
+                .withLore("§7• Dégâts: " + damage(),
+                        "§7• Taille du chargeur: " + clipSize(),
+                        "§7• Munitions maximum: " + totalAmmo(),
+                        "§7• Type de balle: " + ammoType.ammoType(),
+                        "§7• Amélioré: " + (isUpgraded() ? "§aOui" : "§cNon"))
+                .withEnchant(isUpgraded() ? Enchantment.UNBREAKING : null)
+                .withFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
     }
 
     public String name() {
@@ -97,32 +104,36 @@ public class Weapon {
         return ammoRange;
     }
 
-    public int ammoInClip() {
-        System.out.println("test2");
-        if (!weaponItemBuilder().hasPersistentData("survivor", "weapon_ammo_in_clip")) {
-            System.out.println("test");
-            ammoInClip(clipSize);
-        }
+    public int ammoInClip(ItemStack itemStack) {
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        final PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
 
-        //System.out.println(Integer.parseInt(weaponItemBuilder().persistentData("survivor", "weapon_ammo_in_clip", PersistentDataType.STRING)));
-
-        return Integer.parseInt(weaponItemBuilder().persistentData("survivor", "weapon_ammo_in_clip", PersistentDataType.STRING));
+        return persistentDataContainer.get(new NamespacedKey("survivor", "weapon_ammo_in_clip"), PersistentDataType.INTEGER);
     }
 
-    public void ammoInClip(int ammoInClip) {
-        weaponItemBuilder().withPersistentData("survivor", "weapon_ammo_in_clip", String.valueOf(ammoInClip), PersistentDataType.STRING).build();
+    public void ammoInClip(int ammo, ItemStack itemStack) {
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        final PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+
+        persistentDataContainer.set(new NamespacedKey("survivor", "weapon_ammo_in_clip"), PersistentDataType.INTEGER, ammo);
+
+        itemStack.setItemMeta(itemMeta);
     }
 
-    public int totalRemainingAmmo() {
-        if (!weaponItemBuilder().hasPersistentData("survivor", "weapon_total_remaining_ammo")) {
-            totalRemainingAmmo(totalAmmo);
-        }
+    public int totalRemainingAmmo(ItemStack itemStack) {
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        final PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
 
-        return Integer.parseInt(weaponItemBuilder().persistentData("survivor", "weapon_total_remaining_ammo", PersistentDataType.STRING));
+        return persistentDataContainer.get(new NamespacedKey("survivor", "weapon_total_remaining_ammo"), PersistentDataType.INTEGER);
     }
 
-    public void totalRemainingAmmo(int totalRemainingAmmo) {
-        weaponItemBuilder().withPersistentData("survivor", "weapon_total_remaining_ammo", String.valueOf(totalRemainingAmmo), PersistentDataType.STRING).build();
+    public void totalRemainingAmmo(int ammo, ItemStack itemStack) {
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        final PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+
+        persistentDataContainer.set(new NamespacedKey("survivor", "weapon_total_remaining_ammo"), PersistentDataType.INTEGER, ammo);
+
+        itemStack.setItemMeta(itemMeta);
     }
 
     public boolean isUpgraded() {
@@ -141,27 +152,91 @@ public class Weapon {
         return Weapons.weaponByName(upgradedOrDowngradedWeaponName);
     }
 
-    public ItemStack itemStack() {
-        return weaponItemBuilder().build();
+    public ItemStack defaultItemStack() {
+        return itemBuilder.build();
     }
 
-    private ItemBuilder weaponItemBuilder() {
-        System.out.println(ammoInClip);
-        return new ItemBuilder(material)
-                .withPersistentData("survivor", "weapon_ammo_in_clip", String.valueOf(ammoInClip), PersistentDataType.STRING)
-                .withPersistentData("survivor", "weapon_total_remaining_ammo", String.valueOf(totalRemainingAmmo), PersistentDataType.STRING)
-                .withPersistentData("survivor", "weapon_name", name(), PersistentDataType.STRING)
-                .withName("§3" + name + " §6- §f" + ammoInClip + "§e/§7" + totalRemainingAmmo)
-                .withLore("§7• Dégâts: " + damage(),
-                        "§7• Taille du chargeur: " + clipSize(),
-                        "§7• Munitions maximum: " + totalAmmo(),
-                        "§7• Type de balle: " + ammoType.ammoType(),
-                        "§7• Amélioré: " + (isUpgraded() ? "§aOui" : "§cNon"))
-                .withEnchant(isUpgraded() ? Enchantment.UNBREAKING : null)
-                .withFlags(ItemFlag.HIDE_ENCHANTS);
+    public void shoot(Player shooter, ItemStack itemStack, Main main, String test) {
+        final Location start = shooter.getEyeLocation();
+        final Vector direction = start.getDirection();
+        final World world = start.getWorld();
+        double range = this.ammoRange().blocks;
+        final Particle particle = this.ammoType.particle;
+
+        final float xRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
+        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 3 : 3.7F;
+        final float zRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
+
+        int hitMobs = 0;
+
+        final RayTraceResult blockRayTrace = world.rayTraceBlocks(
+                start,
+                direction.clone().normalize(),
+                range,
+                FluidCollisionMode.ALWAYS,
+                true,
+                (block) -> !Weapons.PENETRABLE_BLOCKS.contains(block.getType()));
+
+        Location end = start.clone().add(direction.clone().normalize().multiply(range));
+        if (blockRayTrace != null) {
+            end = blockRayTrace.getHitPosition().toLocation(world);
+            world.spawnParticle(Particle.BLOCK_CRUMBLE, end, 100, blockRayTrace.getHitBlock().getType().createBlockData());
+        }
+
+        range = start.distance(end);
+        Location currentBulletLocation = start.clone();
+
+        bulletLoop:
+        for (int i = 0; i < range; i++) {
+            if (ammoType == AmmoType.EXPLOSIVE) {
+                currentBulletLocation = currentBulletLocation.clone()
+                        .add(direction.getX(), direction.getY() - 0.05D - i * 0.01D, direction.getZ());
+            } else {
+                currentBulletLocation = currentBulletLocation.clone()
+                        .add(direction.getX(), direction.getY() - 0.05D, direction.getZ());
+            }
+
+            world.spawnParticle(particle, currentBulletLocation, 1, 0.02F, 0.02F, 0.02F, 0.05f);
+
+            for (final Entity entity : world.getNearbyEntities(currentBulletLocation, xRadius, yRadius, zRadius,
+                    entity -> entity instanceof LivingEntity && !(entity instanceof Player))) {
+                ((LivingEntity) entity).damage(damage, shooter);
+                hitMobs++;
+
+                if (ammoType == AmmoType.PIERCING_BULLET) {
+                    if (hitMobs == 2) {
+                        break bulletLoop;
+                    }
+                } else if (ammoType == AmmoType.NORMAL) {
+                    break bulletLoop;
+                }
+            }
+        }
+
+        if (ammoType == AmmoType.EXPLOSIVE) {
+            world.createExplosion(currentBulletLocation.add(0, 0.5, 0), 4F, false, false, shooter);
+        }
+
+        this.shootSound.play(shooter.getLocation());
+
+        final int ammoInClip = ammoInClip(itemStack) - 1;
+
+        ammoInClip(ammoInClip, itemStack);
+
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(Component.text("§3" + name + " §6- §f" + ammoInClip + "§e/§7" + totalRemainingAmmo(itemStack)));
+        itemStack.setItemMeta(itemMeta);
+
+        if (ammoInClip <= 0) {
+            if (totalRemainingAmmo(itemStack) <= 0) {
+                shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1.5f, 1.7f);
+                return;
+            }
+            reload(shooter, itemStack, main);
+        }
     }
 
-    public void shoot(Player shooter, ItemStack itemStack) {
+    public void shoot(Player shooter, ItemStack itemStack, Main main) {
         final Location eyeLocation = shooter.getEyeLocation();
         Location bulletLocation = eyeLocation.clone();
         final Particle particle = this.ammoType.particle();
@@ -171,7 +246,7 @@ public class Weapon {
         final World world = eyeLocation.getWorld();
 
         final float xRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
-        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 3.7F;
+        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 3 : 3.7F;
         final float zRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
 
         int hitMobs = 0;
@@ -188,7 +263,13 @@ public class Weapon {
 
             world.spawnParticle(particle, bulletLocation, 1, 0.02F, 0.02F, 0.02F, 0.05f);
 
-            if (bulletLocation.getBlock().getType().isSolid()) break;
+            final Material type = bulletLocation.getBlock().getType();
+
+            if (type.isSolid()) {
+                if (!Weapons.PENETRABLE_BLOCKS.contains(type)) {
+                    break;
+                }
+            }
 
             for (final Entity entity : LocationUtils.entitiesByLocation(bulletLocation, xRadius, yRadius, zRadius)) {
                 if (!(entity instanceof final LivingEntity livingEntity && !(entity instanceof Player))) break;
@@ -206,25 +287,40 @@ public class Weapon {
         }
 
         if (ammoType == AmmoType.EXPLOSIVE) {
-            world.createExplosion(bulletLocation, 4F, false, false, shooter);
+            world.createExplosion(bulletLocation.add(0, 0.5, 0), 4F, false, false, shooter);
         }
 
         this.shootSound.play(shooter.getLocation());
-        this.ammoInClip(ammoInClip - 1);
+
+        final int ammoInClip = ammoInClip(itemStack) - 1;
+
+        ammoInClip(ammoInClip, itemStack);
 
         final ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(itemStack().displayName());
+        itemMeta.displayName(Component.text("§3" + name + " §6- §f" + ammoInClip + "§e/§7" + totalRemainingAmmo(itemStack)));
         itemStack.setItemMeta(itemMeta);
 
-        if (ammoInClip() == 0) reload(itemStack);
+        if (ammoInClip <= 0) {
+            if (totalRemainingAmmo(itemStack) <= 0) {
+                shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1.5f, 1.7f);
+                return;
+            }
+            reload(shooter, itemStack, main);
+        }
     }
 
-    public void reload(ItemStack itemStack) {
+    public void reload(Player player, ItemStack itemStack, Main main) {
+        player.playSound(player.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1.0f, 0.8f);
+        final int time = (int) (ammoInClip(itemStack) == 0 ? reloadTimeEmpty : reloadTime) * 20;
 
+        player.sendActionBar(Component.text("§7• R..."));
+        player.setCooldown(itemStack, time);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 1f, 1.5f), time - 5);
+        main.gameLogic().reloadCooldownManager().cooldownRunnable(player, time, this, itemStack);
     }
 
     public enum AmmoType {
-        NORMAL("Normal", Particle.ELECTRIC_SPARK),
+        NORMAL("Normale", Particle.ELECTRIC_SPARK),
         EXPLOSIVE("Explosive", Particle.ENCHANTED_HIT),
         PIERCING_BULLET("Balle perforante", Particle.CRIT),
 

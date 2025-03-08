@@ -28,8 +28,7 @@ public class GiveWeaponInventory {
     private List<ItemStack> items() {
         return Arrays.stream(Weapons.values()).map(weapons -> {
             final Weapon weapon = weapons.weapon();
-
-            return weapon.itemStack();
+            return new ItemStack(weapon.defaultItemStack());
         }).toList();
     }
 

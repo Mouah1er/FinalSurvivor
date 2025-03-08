@@ -11,20 +11,15 @@ import fr.twah2em.survivor.inventories.room.cuboids.ShowCuboidInfoSurvivorInvent
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
 import fr.twah2em.survivor.utils.Messages;
 import fr.twah2em.survivor.utils.items.Items;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.pointer.Pointer;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public class PlayerInteractListener implements SurvivorListener<PlayerInteractEvent> {
     private final Main main;
@@ -45,7 +40,7 @@ public class PlayerInteractListener implements SurvivorListener<PlayerInteractEv
         handleCuboidSign(event, player, itemStack);
         handleWeaponUse(event, player, itemStack);
 
-        System.out.println(new ItemBuilder(itemStack).hasPersistentData("survivor", "weapon_ammo_in_clip"));
+        //System.out.println(new ItemBuilder(defaultItemStack).hasPersistentData("survivor", "weapon_ammo_in_clip"));
     }
 
     private void handleWand(PlayerInteractEvent event, Player player, ItemStack itemStack) {
@@ -98,6 +93,7 @@ public class PlayerInteractListener implements SurvivorListener<PlayerInteractEv
 
         if (weapon == null) return;
         if (weapon.material() != itemStack.getType() || !weapon.name().equals(name)) return;
+        event.setCancelled(true);
 
         final int reloadCooldown = main.gameLogic().reloadCooldownManager().playerCooldown(player.getUniqueId());
         if (reloadCooldown > 0) return;
@@ -105,15 +101,20 @@ public class PlayerInteractListener implements SurvivorListener<PlayerInteractEv
         final int shootCooldown = main.gameLogic().shootCooldownManager().playerCooldown(player.getUniqueId());
         if (shootCooldown > 0) return;
 
-        if (weapon.ammoInClip() == 0) {
-            weapon.reload(itemStack);
+        if (weapon.ammoInClip(itemStack) <= 0) {
+            if (weapon.totalRemainingAmmo(itemStack) <= 0) {
+                player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1.5f, 1.7f);
+                return;
+            }
+
+            weapon.reload(player, itemStack, main);
 
             return;
         }
 
-        weapon.shoot(player, itemStack);
+        weapon.shoot(player, itemStack, main, "");
 
-        final int weaponCooldownInTick = (int) weapon.rateOfFire() / 1000 * 20;
+        final int weaponCooldownInTick = (int) (20 / (weapon.rateOfFire() / 60));
         main.gameLogic().shootCooldownManager().cooldownRunnable(player.getUniqueId(), weaponCooldownInTick);
     }
 }

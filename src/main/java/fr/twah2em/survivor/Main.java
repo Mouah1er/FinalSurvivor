@@ -1,7 +1,5 @@
 package fr.twah2em.survivor;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import fr.twah2em.survivor.commands.weapons.GiveWeaponCommand;
 import fr.twah2em.survivor.commands.start.StartCommand;
 import fr.twah2em.survivor.commands.internal.SurvivorCommandRegistration;
@@ -23,12 +21,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Main extends JavaPlugin {
     private GameLogic gameLogic;
     private GameInfos gameInfos;
-    private ProtocolManager protocolManager;
 
     @Override
     public void onEnable() {
         getLogger().info("Main plugin is starting !");
-        //this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         saveDefaultConfig();
 
@@ -62,10 +58,6 @@ public final class Main extends JavaPlugin {
     public void onDisable() {
         Bukkit.getWorlds().get(0).getEntities().stream().filter(entity -> !(entity instanceof Player)).forEach(Entity::remove);
         Bukkit.getOnlinePlayers().forEach(player -> player.kick(Messages.RESTART_MESSAGE));
-    }
-
-    public ProtocolManager protocolManager() {
-        return protocolManager;
     }
 
     public GameLogic gameLogic() {

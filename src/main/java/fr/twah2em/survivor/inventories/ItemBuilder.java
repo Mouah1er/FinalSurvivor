@@ -2,6 +2,7 @@ package fr.twah2em.survivor.inventories;
 
 import fr.twah2em.survivor.utils.items.ItemUtils;
 import fr.twah2em.survivor.utils.items.Items;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -96,6 +97,11 @@ public class ItemBuilder {
 
     public ItemBuilder withName(String name) {
         this.meta.setDisplayName(name);
+        return this;
+    }
+
+    public ItemBuilder withName(Component name) {
+        this.meta.displayName(name);
         return this;
     }
 
