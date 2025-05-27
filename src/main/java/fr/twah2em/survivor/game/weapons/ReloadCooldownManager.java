@@ -37,18 +37,26 @@ public class ReloadCooldownManager {
     public void cooldownRunnable(Player player, int time, Weapon weapon, ItemStack itemStack) {
         playerCooldown(player.getUniqueId(), time);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
-            weapon.ammoInClip(weapon.clipSize(), itemStack);
-            weapon.totalRemainingAmmo(weapon.totalRemainingAmmo(itemStack) - weapon.clipSize(), itemStack);
+        Bukkit.getScheduler().runTaskLater(main, () -> {
+            System.out.println(weapon.ammoInClip(itemStack));
+            final int clipSize = weapon.clipSize();
+            final int totalRemainingAmmo = weapon.totalRemainingAmmo(itemStack);
+            final int needed = clipSize - weapon.ammoInClip(itemStack);
+
+            weapon.ammoInClip(weapon.ammoInClip(itemStack) + needed, itemStack);
+            weapon.totalRemainingAmmo(totalRemainingAmmo - needed, itemStack);
+
+            System.out.println(weapon.ammoInClip(itemStack));
 
             final ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(
-                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + weapon.totalRemainingAmmo(itemStack)));
+                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + totalRemainingAmmo));
             itemStack.setItemMeta(itemMeta);
+
+            player.getInventory().setItemInMainHand(itemStack);
 
             player.sendActionBar(Component.empty());
             player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.7f, 2.0f);
-
             playerCooldown(player.getUniqueId(), -1);
         }, time);
     }

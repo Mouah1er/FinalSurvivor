@@ -112,7 +112,7 @@ public class PlayerInteractListener implements SurvivorListener<PlayerInteractEv
             return;
         }
 
-        weapon.shoot(player, itemStack, main, "");
+        weapon.shoot(player, itemStack, main);
 
         final int weaponCooldownInTick = (int) (20 / (weapon.rateOfFire() / 60));
         main.gameLogic().shootCooldownManager().cooldownRunnable(player.getUniqueId(), weaponCooldownInTick);

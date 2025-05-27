@@ -156,7 +156,7 @@ public class Weapon {
         return itemBuilder.build();
     }
 
-    public void shoot(Player shooter, ItemStack itemStack, Main main, String test) {
+    public void shoot(Player shooter, ItemStack itemStack, Main main) {
         final Location start = shooter.getEyeLocation();
         final Vector direction = start.getDirection();
         final World world = start.getWorld();
@@ -215,79 +215,6 @@ public class Weapon {
 
         if (ammoType == AmmoType.EXPLOSIVE) {
             world.createExplosion(currentBulletLocation.add(0, 0.5, 0), 4F, false, false, shooter);
-        }
-
-        this.shootSound.play(shooter.getLocation());
-
-        final int ammoInClip = ammoInClip(itemStack) - 1;
-
-        ammoInClip(ammoInClip, itemStack);
-
-        final ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(Component.text("§3" + name + " §6- §f" + ammoInClip + "§e/§7" + totalRemainingAmmo(itemStack)));
-        itemStack.setItemMeta(itemMeta);
-
-        if (ammoInClip <= 0) {
-            if (totalRemainingAmmo(itemStack) <= 0) {
-                shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 1.5f, 1.7f);
-                return;
-            }
-            reload(shooter, itemStack, main);
-        }
-    }
-
-    public void shoot(Player shooter, ItemStack itemStack, Main main) {
-        final Location eyeLocation = shooter.getEyeLocation();
-        Location bulletLocation = eyeLocation.clone();
-        final Particle particle = this.ammoType.particle();
-        final double damage = this.damage();
-        final int range = this.ammoRange.blocks();
-        final AmmoType ammoType = this.ammoType();
-        final World world = eyeLocation.getWorld();
-
-        final float xRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
-        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 3 : 3.7F;
-        final float zRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
-
-        int hitMobs = 0;
-
-        bulletLoop:
-        for (int i = 0; i <= range; i++) {
-            if (ammoType == AmmoType.EXPLOSIVE) {
-                bulletLocation = bulletLocation.clone()
-                        .add(eyeLocation.getDirection().getX(), eyeLocation.getDirection().getY() - 0.05D - i * 0.01D, eyeLocation.getDirection().getZ());
-            } else {
-                bulletLocation = bulletLocation.clone()
-                        .add(eyeLocation.getDirection().getX(), eyeLocation.getDirection().getY() - 0.05D, eyeLocation.getDirection().getZ());
-            }
-
-            world.spawnParticle(particle, bulletLocation, 1, 0.02F, 0.02F, 0.02F, 0.05f);
-
-            final Material type = bulletLocation.getBlock().getType();
-
-            if (type.isSolid()) {
-                if (!Weapons.PENETRABLE_BLOCKS.contains(type)) {
-                    break;
-                }
-            }
-
-            for (final Entity entity : LocationUtils.entitiesByLocation(bulletLocation, xRadius, yRadius, zRadius)) {
-                if (!(entity instanceof final LivingEntity livingEntity && !(entity instanceof Player))) break;
-                livingEntity.damage(damage, shooter);
-                hitMobs++;
-
-                if (ammoType == AmmoType.PIERCING_BULLET) {
-                    if (hitMobs == 2) {
-                        break bulletLoop;
-                    }
-                } else if (ammoType == AmmoType.NORMAL) {
-                    break bulletLoop;
-                }
-            }
-        }
-
-        if (ammoType == AmmoType.EXPLOSIVE) {
-            world.createExplosion(bulletLocation.add(0, 0.5, 0), 4F, false, false, shooter);
         }
 
         this.shootSound.play(shooter.getLocation());
