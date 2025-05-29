@@ -164,7 +164,7 @@ public class Weapon {
         final Particle particle = this.ammoType.particle;
 
         final float xRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
-        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 3 : 3.7F;
+        final float yRadius = ammoType == AmmoType.EXPLOSIVE ? 3 : 0;
         final float zRadius = ammoType == AmmoType.EXPLOSIVE ? 5 : 0.25F;
 
         int hitMobs = 0;
@@ -180,10 +180,10 @@ public class Weapon {
         Location end = start.clone().add(direction.clone().normalize().multiply(range));
         if (blockRayTrace != null) {
             end = blockRayTrace.getHitPosition().toLocation(world);
-            world.spawnParticle(Particle.BLOCK_CRUMBLE, end, 100, blockRayTrace.getHitBlock().getType().createBlockData());
+            world.spawnParticle(Particle.BLOCK, end, 100, blockRayTrace.getHitBlock().getType().createBlockData());
         }
 
-        range = start.distance(end);
+        range = start.distance(end) - 1;
         Location currentBulletLocation = start.clone();
 
         bulletLoop:
@@ -241,7 +241,7 @@ public class Weapon {
         final int time = (int) (ammoInClip(itemStack) == 0 ? reloadTimeEmpty : reloadTime) * 20;
 
         player.sendActionBar(Component.text("§7• R..."));
-        player.setCooldown(itemStack, time);
+        player.setCooldown(itemStack.getType(), time);
         Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 1f, 1.5f), time - 5);
         main.gameLogic().reloadCooldownManager().cooldownRunnable(player, time, this, itemStack);
     }

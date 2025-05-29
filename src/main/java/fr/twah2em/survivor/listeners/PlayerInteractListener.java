@@ -39,8 +39,6 @@ public class PlayerInteractListener implements SurvivorListener<PlayerInteractEv
         handleWand(event, player, itemStack);
         handleCuboidSign(event, player, itemStack);
         handleWeaponUse(event, player, itemStack);
-
-        //System.out.println(new ItemBuilder(defaultItemStack).hasPersistentData("survivor", "weapon_ammo_in_clip"));
     }
 
     private void handleWand(PlayerInteractEvent event, Player player, ItemStack itemStack) {

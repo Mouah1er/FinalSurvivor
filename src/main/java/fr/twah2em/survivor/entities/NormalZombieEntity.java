@@ -22,7 +22,7 @@ public class NormalZombieEntity {
     }
 
     private static void metadata(double health, Zombie zombie) {
-        zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(/*health*/20);
+        zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(/*health*/20);
         zombie.setHealth(/*health*/20);
         zombie.getPassengers().forEach(zombie::removePassenger);
         zombie.setAdult();

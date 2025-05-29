@@ -114,11 +114,8 @@ public class PlayerDropItemListener implements SurvivorListener<PlayerDropItemEv
             }
         }
 
+        if (weapon.ammoInClip(itemStack) >= weapon.clipSize()) return;
+        
         weapon.reload(player, itemStack, main);
-        System.out.println(weapon.ammoInClip(itemStack));
-        /*Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
-            System.out.println(weapon.ammoInClip(itemStack));
-            System.out.println(((TextComponent) itemStack.getItemMeta().displayName()).content());
-        }, (int) (weapon.ammoInClip(itemStack) == 0 ? weapon.reloadTimeEmpty() : weapon.reloadTime()) * 20L + 10);*/
     }
 }

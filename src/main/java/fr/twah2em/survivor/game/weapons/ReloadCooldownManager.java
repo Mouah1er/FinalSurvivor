@@ -38,19 +38,16 @@ public class ReloadCooldownManager {
         playerCooldown(player.getUniqueId(), time);
 
         Bukkit.getScheduler().runTaskLater(main, () -> {
-            System.out.println(weapon.ammoInClip(itemStack));
             final int clipSize = weapon.clipSize();
             final int totalRemainingAmmo = weapon.totalRemainingAmmo(itemStack);
-            final int needed = clipSize - weapon.ammoInClip(itemStack);
+            final int needed = Math.min(clipSize - weapon.ammoInClip(itemStack), totalRemainingAmmo);
 
             weapon.ammoInClip(weapon.ammoInClip(itemStack) + needed, itemStack);
             weapon.totalRemainingAmmo(totalRemainingAmmo - needed, itemStack);
 
-            System.out.println(weapon.ammoInClip(itemStack));
-
             final ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(
-                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + totalRemainingAmmo));
+                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + weapon.totalRemainingAmmo(itemStack)));
             itemStack.setItemMeta(itemMeta);
 
             player.getInventory().setItemInMainHand(itemStack);

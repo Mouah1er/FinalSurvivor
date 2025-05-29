@@ -20,13 +20,9 @@ public class SurvivorPlayer {
     private Room room = null;
     private Cuboid cuboid = null;
 
-    private FastBoard board;
-
     public SurvivorPlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-
-        this.board = new FastBoard(Bukkit.getPlayer(uuid));
     }
 
     public SurvivorPlayer(Player player) {
@@ -114,11 +110,7 @@ public class SurvivorPlayer {
     }
 
     public FastBoard board() {
-        return board;
-    }
-
-    public void board(FastBoard board) {
-        this.board = board;
+        return new FastBoard(Bukkit.getPlayer(uuid));
     }
 
     public static boolean playerIsSurvivorPlayer(Player player, List<SurvivorPlayer> players) {

@@ -1,5 +1,7 @@
 package fr.twah2em.survivor;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import fr.twah2em.survivor.commands.weapons.GiveWeaponCommand;
 import fr.twah2em.survivor.commands.start.StartCommand;
 import fr.twah2em.survivor.commands.internal.SurvivorCommandRegistration;
@@ -21,10 +23,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Main extends JavaPlugin {
     private GameLogic gameLogic;
     private GameInfos gameInfos;
+    private ProtocolManager protocolManager;
 
     @Override
     public void onEnable() {
         getLogger().info("Main plugin is starting !");
+        protocolManager = ProtocolLibrary.getProtocolManager();
 
         saveDefaultConfig();
 
@@ -66,5 +70,9 @@ public final class Main extends JavaPlugin {
 
     public GameInfos gameInfos() {
         return gameInfos;
+    }
+
+    public ProtocolManager protocolManager() {
+        return protocolManager;
     }
 }

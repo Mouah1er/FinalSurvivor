@@ -1,6 +1,8 @@
 package fr.twah2em.survivor.listeners;
 
 import fr.twah2em.survivor.Main;
+import fr.twah2em.survivor.game.player.SurvivorPlayer;
+import fr.twah2em.survivor.game.player.corpse.CorpseManager;
 import fr.twah2em.survivor.listeners.internal.SurvivorListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -9,6 +11,7 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class EntityDamageByEntityListener implements SurvivorListener<EntityDamageByEntityEvent> {
@@ -42,6 +45,17 @@ public class EntityDamageByEntityListener implements SurvivorListener<EntityDama
                     }
 
                     main.gameInfos().round().zombieKilled(event, player, zombie);
+                }
+            }
+        }
+
+        if (entity instanceof final Player player) {
+            if (player.getHealth() - damage <= 0) {
+                final SurvivorPlayer survivorPlayer = SurvivorPlayer.survivorPlayer(player, main.gameInfos().players());
+
+                if (survivorPlayer != null) {
+                    event.setCancelled(true);
+                    CorpseManager.createCorpse(player, main);
                 }
             }
         }

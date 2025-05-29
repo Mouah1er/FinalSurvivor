@@ -2,6 +2,7 @@ package fr.twah2em.survivor.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.data.type.Slab;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.NumberConversions;
 
@@ -41,5 +42,23 @@ public class LocationUtils {
         double dz = Math.abs(center.getZ() - entityLocation.getZ());
 
         return dx <= radiusX && dy <= radiusY && dz <= radiusZ;
+    }
+
+    public static double highestBlockY(Location location) {
+        Location highestBlockLocation = location.getWorld().getHighestBlockAt(location).getLocation();
+
+        if (highestBlockLocation.getBlockY() < location.getBlockY()) {
+            return highestBlockLocation.getBlockY() + 0.9 + offset(highestBlockLocation);
+        }
+
+        return location.getBlockY() - 0.1 + offset(location);
+    }
+
+    public static double offset(Location location) {
+        if (location.getWorld().getBlockAt(location).getBlockData() instanceof Slab) {
+            return 0.5;
+        }
+
+        return 0;
     }
 }

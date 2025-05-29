@@ -60,6 +60,8 @@ public class RoundRunnable extends BukkitRunnable {
             }
 
             final Zombie zombie = NormalZombieEntity.spawn(zombieHealth, zombieSpawnLocation);
+            zombie.setTarget(survivorPlayer.player());
+            zombie.clearActiveItem();
             zombiesInMap.add(zombie.getUniqueId());
 
             zombiesToSpawn--;
