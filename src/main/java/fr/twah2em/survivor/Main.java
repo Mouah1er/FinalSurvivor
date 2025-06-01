@@ -50,7 +50,8 @@ public final class Main extends JavaPlugin {
                 PlayerEnterCuboidListener::new,
                 PlayerDropItemListener::new,
                 BlockBreakListener::new,
-                PlayerInteractListener::new
+                PlayerInteractListener::new,
+                PlayerToggleSneakListener::new
         );
 
         this.gameLogic = new GameLogic(this);

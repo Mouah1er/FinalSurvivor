@@ -2,6 +2,7 @@ package fr.twah2em.survivor.game;
 
 import fr.twah2em.survivor.Main;
 import fr.twah2em.survivor.game.player.SurvivorPlayer;
+import fr.twah2em.survivor.game.player.corpse.ReviveCooldownManager;
 import fr.twah2em.survivor.game.weapons.ReloadCooldownManager;
 import fr.twah2em.survivor.game.weapons.ShootCooldownManager;
 import org.bukkit.Bukkit;
@@ -12,11 +13,13 @@ public class GameLogic {
     private final Main main;
     private final ShootCooldownManager shootCooldownManager;
     private final ReloadCooldownManager reloadCooldownManager;
+    private final ReviveCooldownManager reviveCooldownManager;
 
     public GameLogic(Main main) {
         this.main = main;
         this.shootCooldownManager = new ShootCooldownManager(main);
         this.reloadCooldownManager = new ReloadCooldownManager(main);
+        this.reviveCooldownManager = new ReviveCooldownManager(main);
     }
 
     public void start() {
@@ -54,5 +57,9 @@ public class GameLogic {
 
     public ReloadCooldownManager reloadCooldownManager() {
         return reloadCooldownManager;
+    }
+
+    public ReviveCooldownManager reviveCooldownManager() {
+        return reviveCooldownManager;
     }
 }

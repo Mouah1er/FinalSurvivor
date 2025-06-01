@@ -6,6 +6,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
 import fr.twah2em.survivor.Main;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.world.entity.Pose;
 import org.bukkit.GameMode;
@@ -20,7 +22,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class CorpseManager {
-    public static final HashMap<UUID, Integer> PLAYER_CORPSE = new HashMap<>();
+    private static final HashMap<UUID, Integer> PLAYER_CORPSE_ID = new HashMap<>();
+    public static final HashMap<UUID, String> PLAYER_CORPSE_NAME = new HashMap<>();
 
     public static void createCorpse(Player player, Main main) {
         final ProtocolManager protocolManager = main.protocolManager();
@@ -53,7 +56,11 @@ public class CorpseManager {
             }
         });
 
-        PLAYER_CORPSE.put(player.getUniqueId(), id);
+        ClientboundAddEntityPacket packet = (ClientboundAddEntityPacket) spawnEntityPacket.getHandle();
+        System.out.println(packet.getUUID() + " corpsemanager");
+
+        PLAYER_CORPSE_ID.put(player.getUniqueId(), id);
+        PLAYER_CORPSE_NAME.put(player.getUniqueId(), corpse.getName());
     }
 
     private static PacketContainer playerInfoPacket(WrappedGameProfile corpse, ProtocolManager protocolManager) {
@@ -134,15 +141,17 @@ public class CorpseManager {
     }
 
     public static void destroyCorpse(Main main, Player player) {
-        final Integer corpseId = PLAYER_CORPSE.get(player.getUniqueId());
+        final Integer corpseId = PLAYER_CORPSE_ID.get(player.getUniqueId());
 
         if (corpseId != null) {
             final PacketContainer entityDestroyPacket = main.protocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY);
             entityDestroyPacket.getModifier().write(0, IntList.of(corpseId));
 
+
             player.getWorld().getPlayers().forEach(player1 -> main.protocolManager().sendServerPacket(player1, entityDestroyPacket));
 
-            PLAYER_CORPSE.remove(player.getUniqueId());
+            PLAYER_CORPSE_ID.remove(player.getUniqueId());
+            PLAYER_CORPSE_NAME.remove(player.getUniqueId());
         }
     }
 }

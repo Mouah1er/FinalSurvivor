@@ -47,7 +47,8 @@ public class ReloadCooldownManager {
 
             final ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(
-                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + weapon.totalRemainingAmmo(itemStack)));
+                    Component.text("§3" + weapon.name() + " §6- §f" + weapon.ammoInClip(itemStack) + "§e/§7" + weapon.totalRemainingAmmo(itemStack))
+            );
             itemStack.setItemMeta(itemMeta);
 
             player.getInventory().setItemInMainHand(itemStack);
